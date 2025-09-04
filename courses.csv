@@ -1,0 +1,16 @@
+course_id,course_name,instructor,start_date,end_date,start_time,end_time,days,location,credits,program
+CS101,Introduction to Programming,Dr. Smith,2025-09-01,2025-12-15,09:00,10:30,"Monday,Wednesday,Friday",Room 101,3,Computer Science
+CS102,Data Structures,Prof. Johnson,2025-09-01,2025-12-15,11:00,12:30,"Tuesday,Thursday",Room 102,4,Computer Science
+CS103,Web Development,Dr. Brown,2025-09-01,2025-12-15,14:00,15:30,"Monday,Wednesday",Lab 201,3,Computer Science
+MATH201,Calculus I,Dr. Wilson,2025-09-01,2025-12-15,10:00,11:30,"Monday,Wednesday,Friday",Room 103,4,Mathematics
+MATH202,Linear Algebra,Prof. Davis,2025-09-01,2025-12-15,13:00,14:30,"Tuesday,Thursday",Room 104,3,Mathematics
+ENG101,Technical Writing,Ms. Garcia,2025-09-01,2025-12-15,15:00,16:30,"Wednesday,Friday",Room 105,2,General Education
+PHYS101,Physics I,Dr. Lee,2025-09-01,2025-12-15,09:00,10:30,"Tuesday,Thursday",Lab 301,4,Physics
+CS201,Advanced Programming,Dr. Smith,2025-09-01,2025-12-15,16:00,17:30,"Monday,Wednesday,Friday",Lab 202,3,Computer Science
+CS301,Database Systems,Prof. Chen,2025-09-01,2025-12-15,10:00,11:30,"Tuesday,Thursday",Lab 203,3,Computer Science
+MATH301,Statistics,Dr. Taylor,2025-09-01,2025-12-15,14:00,15:30,"Monday,Friday",Room 106,3,Mathematics
+ENG201,Advanced Writing,Ms. Rodriguez,2025-09-01,2025-12-15,11:00,12:30,"Monday,Wednesday",Room 107,3,General Education
+PHYS201,Physics II,Dr. Lee,2025-09-01,2025-12-15,13:00,14:30,"Tuesday,Thursday",Lab 302,4,Physics
+CS302,Software Engineering,Dr. Kim,2025-09-01,2025-12-15,09:00,10:30,"Wednesday,Friday",Lab 204,4,Computer Science
+MATH401,Advanced Calculus,Prof. Martinez,2025-09-01,2025-12-15,15:00,16:30,"Monday,Wednesday",Room 108,4,Mathematics
+CS401,Machine Learning,Dr. Zhang,2025-09-01,2025-12-15,11:00,12:30,"Tuesday,Thursday",Lab 205,3,Computer Science

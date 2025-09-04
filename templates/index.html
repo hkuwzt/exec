@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Schedule Manager</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .calendar-container {
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .calendar-header {
+            background-color: #495057;
+            color: white;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .calendar-nav {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1px;
+            background-color: #dee2e6;
+        }
+        
+        .calendar-day-header {
+            background-color: #6c757d;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .calendar-day {
+            background-color: white;
+            min-height: 120px;
+            padding: 8px;
+            position: relative;
+            border: 1px solid #dee2e6;
+        }
+        
+        .calendar-day.other-month {
+            background-color: #f8f9fa;
+            color: #6c757d;
+        }
+        
+        .calendar-day.today {
+            background-color: #e3f2fd;
+            border-color: #2196f3;
+        }
+        
+        .day-number {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .weekly-schedule {
+            display: grid;
+            grid-template-columns: 100px repeat(7, 1fr);
+            gap: 1px;
+            background-color: #dee2e6;
+            border: 1px solid #dee2e6;
+            margin-top: 20px;
+        }
+        
+        .time-slot {
+            background-color: #f8f9fa;
+            padding: 10px 5px;
+            text-align: center;
+            font-size: 0.8em;
+            border-right: 1px solid #dee2e6;
+        }
+        
+        .day-cell {
+            background-color: white;
+            min-height: 60px;
+            padding: 5px;
+            position: relative;
+        }
+        
+        .weekly-header {
+            background-color: #495057;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .course-event {
+            color: white;
+            padding: 8px 12px;
+            margin: 2px 0;
+            border-radius: 6px;
+            font-size: 0.85em;
+            cursor: pointer;
+            position: relative;
+            min-height: 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .course-event:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        
+        .course-event.large {
+            padding: 12px 16px;
+            font-size: 0.95em;
+            min-height: 70px;
+            font-weight: 500;
+        }
+        
+        .course-id {
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-bottom: 2px;
+        }
+        
+        .course-time {
+            font-size: 0.85em;
+            opacity: 0.95;
+            font-weight: 500;
+            background-color: rgba(255,255,255,0.2);
+            padding: 2px 6px;
+            border-radius: 3px;
+            margin-top: 4px;
+        }
+        
+        .course-event.overlap {
+            background-color: #dc3545 !important;
+            animation: pulse 1s infinite;
+        }
+        
+        /* Program color schemes */
+        .program-computer-science {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .program-mathematics {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        
+        .program-physics {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        
+        .program-general-education {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+        
+        .program-engineering {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+        
+        .program-biology {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+        
+        .course-card {
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            background-color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .course-card:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+        
+        .course-card.selected {
+            border-color: #007bff;
+            background-color: #f8f9ff;
+        }
+        
+        .overlap-warning {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        
+        .filter-section {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .course-details {
+            font-size: 0.9em;
+            color: #6c757d;
+        }
+        
+        .selected-courses {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <nav class="navbar navbar-dark bg-primary mb-4">
+                    <div class="container-fluid">
+                        <span class="navbar-brand mb-0 h1">
+                            <i class="fas fa-calendar-alt me-2"></i>
+                            Course Schedule Manager
+                        </span>
+                    </div>
+                </nav>
+            </div>
+        </div>
+        
+        <div class="row">
+            <!-- Sidebar with course selection -->
+            <div class="col-md-4">
+                <div class="filter-section">
+                    <h5><i class="fas fa-filter me-2"></i>Program Filter</h5>
+                    <select id="programFilter" class="form-select mb-3">
+                        <option value="All">All Programs</option>
+                        {% for program in programs %}
+                        <option value="{{ program }}">{{ program }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <!-- Selected Courses Summary (moved to top) -->
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h6><i class="fas fa-check-circle me-2"></i>Selected Courses</h6>
+                            <button id="clearAll" class="btn btn-outline-danger btn-sm">
+                                <i class="fas fa-times me-1"></i>Clear All
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body selected-courses" id="selectedCourses">
+                        <p class="text-muted">No courses selected</p>
+                    </div>
+                </div>
+                
+                <!-- Overlap Warnings -->
+                <div id="overlapWarnings"></div>
+                
+                <div class="filter-section">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5><i class="fas fa-list me-2"></i>Available Courses</h5>
+                    </div>
+                    
+                    <div id="courseList" class="course-list">
+                        <!-- Courses will be populated here -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Main calendar view -->
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5><i class="fas fa-calendar me-2"></i>Course Calendar</h5>
+                            <div class="btn-group" role="group">
+                                <button type="button" class="btn btn-outline-primary active" id="monthViewBtn">
+                                    <i class="fas fa-calendar-alt me-1"></i>Month
+                                </button>
+                                <button type="button" class="btn btn-outline-primary" id="weekViewBtn">
+                                    <i class="fas fa-list me-1"></i>Week
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <!-- Monthly Calendar View -->
+                        <div id="monthView" class="calendar-container">
+                            <div class="calendar-header">
+                                <button class="btn btn-outline-light btn-sm" id="prevMonth">
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                                <div class="calendar-nav">
+                                    <h5 id="currentMonth" class="mb-0"></h5>
+                                    <button class="btn btn-outline-light btn-sm" id="todayBtn">Today</button>
+                                </div>
+                                <button class="btn btn-outline-light btn-sm" id="nextMonth">
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                            </div>
+                            <div id="monthCalendar" class="calendar-grid">
+                                <!-- Monthly calendar will be generated here -->
+                            </div>
+                        </div>
+                        
+                        <!-- Weekly Schedule View -->
+                        <div id="weekView" class="d-none">
+                            <div id="weeklySchedule" class="weekly-schedule">
+                                <!-- Weekly schedule will be generated here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+    <script>
+        class CourseScheduler {
+            constructor() {
+                this.selectedCourses = new Set();
+                this.allCourses = [];
+                this.currentOverlaps = [];
+                this.currentDate = new Date();
+                this.currentView = 'month';
+                this.init();
+            }
+            
+            async init() {
+                await this.loadCourses();
+                this.setupEventListeners();
+                this.generateMonthCalendar();
+                this.generateWeeklySchedule();
+                this.setupViewToggle();
+            }
+            
+            async loadCourses(program = 'All') {
+                try {
+                    const response = await fetch(`/api/courses?program=${encodeURIComponent(program)}`);
+                    this.allCourses = await response.json();
+                    console.log('Loaded courses:', this.allCourses); // Debug log
+                    this.displayCourses();
+                } catch (error) {
+                    console.error('Error loading courses:', error);
+                }
+            }
+            
+            displayCourses() {
+                const courseList = document.getElementById('courseList');
+                courseList.innerHTML = '';
+                
+                if (this.allCourses.length === 0) {
+                    courseList.innerHTML = '<p class="text-muted">No courses available</p>';
+                    return;
+                }
+                
+                this.allCourses.forEach(course => {
+                    const courseCard = document.createElement('div');
+                    courseCard.className = `course-card ${this.selectedCourses.has(course.course_id) ? 'selected' : ''}`;
+                    courseCard.dataset.courseId = course.course_id;
+                    
+                    courseCard.innerHTML = `
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h6 class="mb-0">${course.course_id}</h6>
+                        </div>
+                        <div class="fw-bold mb-1">${course.course_name}</div>
+                        <div class="course-details">
+                            <div><i class="fas fa-user me-1"></i>${course.instructor}</div>
+                            <div><i class="fas fa-clock me-1"></i>${course.start_time} - ${course.end_time}</div>
+                            <div><i class="fas fa-calendar-day me-1"></i>${course.days}</div>
+                            <div><i class="fas fa-map-marker-alt me-1"></i>${course.location}</div>
+                            <div><i class="fas fa-graduation-cap me-1"></i>${course.program}</div>
+                        </div>
+                    `;
+                    
+                    courseCard.addEventListener('click', () => this.toggleCourse(course.course_id));
+                    courseList.appendChild(courseCard);
+                });
+            }
+            
+            setupEventListeners() {
+                document.getElementById('programFilter').addEventListener('change', (e) => {
+                    this.loadCourses(e.target.value);
+                });
+                
+                document.getElementById('clearAll').addEventListener('click', () => {
+                    this.selectedCourses.clear();
+                    this.updateDisplay();
+                });
+                
+                // Calendar navigation
+                document.getElementById('prevMonth').addEventListener('click', () => {
+                    this.currentDate.setMonth(this.currentDate.getMonth() - 1);
+                    this.generateMonthCalendar();
+                    this.updateCalendars();
+                });
+                
+                document.getElementById('nextMonth').addEventListener('click', () => {
+                    this.currentDate.setMonth(this.currentDate.getMonth() + 1);
+                    this.generateMonthCalendar();
+                    this.updateCalendars();
+                });
+                
+                document.getElementById('todayBtn').addEventListener('click', () => {
+                    this.currentDate = new Date();
+                    this.generateMonthCalendar();
+                    this.updateCalendars();
+                });
+            }
+            
+            setupViewToggle() {
+                const monthViewBtn = document.getElementById('monthViewBtn');
+                const weekViewBtn = document.getElementById('weekViewBtn');
+                const monthView = document.getElementById('monthView');
+                const weekView = document.getElementById('weekView');
+                
+                monthViewBtn.addEventListener('click', () => {
+                    this.currentView = 'month';
+                    monthViewBtn.classList.add('active');
+                    weekViewBtn.classList.remove('active');
+                    monthView.classList.remove('d-none');
+                    weekView.classList.add('d-none');
+                    // Refresh calendar with selected courses
+                    this.updateCalendars();
+                });
+                
+                weekViewBtn.addEventListener('click', () => {
+                    this.currentView = 'week';
+                    weekViewBtn.classList.add('active');
+                    monthViewBtn.classList.remove('active');
+                    weekView.classList.remove('d-none');
+                    monthView.classList.add('d-none');
+                    // Refresh calendar with selected courses
+                    this.updateCalendars();
+                });
+            }
+            
+            toggleCourse(courseId) {
+                if (this.selectedCourses.has(courseId)) {
+                    this.selectedCourses.delete(courseId);
+                } else {
+                    this.selectedCourses.add(courseId);
+                }
+                this.updateDisplay();
+            }
+            
+            async updateDisplay() {
+                // Update course cards
+                document.querySelectorAll('.course-card').forEach(card => {
+                    const courseId = card.dataset.courseId;
+                    card.classList.toggle('selected', this.selectedCourses.has(courseId));
+                });
+                
+                // Update selected courses summary
+                this.updateSelectedCoursesSummary();
+                
+                // Update calendars
+                await this.updateCalendars();
+            }
+            
+            updateSelectedCoursesSummary() {
+                const container = document.getElementById('selectedCourses');
+                
+                if (this.selectedCourses.size === 0) {
+                    container.innerHTML = '<p class="text-muted">No courses selected</p>';
+                    return;
+                }
+                
+                const selectedCoursesList = this.allCourses.filter(course => 
+                    this.selectedCourses.has(course.course_id)
+                );
+                
+                container.innerHTML = selectedCoursesList.map(course => `
+                    <div class="mb-2 p-2 bg-light rounded d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="fw-bold">${course.course_id}</div>
+                            <div class="small text-muted">${course.course_name}</div>
+                        </div>
+                        <button class="btn btn-outline-danger btn-sm" onclick="scheduler.toggleCourse('${course.course_id}')">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                `).join('');
+            }
+            
+            async updateCalendars() {
+                if (this.selectedCourses.size === 0) {
+                    this.clearCalendarEvents();
+                    this.clearOverlapWarnings();
+                    return;
+                }
+                
+                try {
+                    const courseIds = Array.from(this.selectedCourses);
+                    const params = new URLSearchParams();
+                    courseIds.forEach(id => params.append('courses', id));
+                    
+                    const response = await fetch(`/api/calendar?${params}`);
+                    const data = await response.json();
+                    
+                    this.displayCalendarEvents(data.events);
+                    this.displayOverlapWarnings(data.overlaps);
+                } catch (error) {
+                    console.error('Error updating calendar:', error);
+                }
+            }
+            
+            generateMonthCalendar() {
+                const calendar = document.getElementById('monthCalendar');
+                const monthHeader = document.getElementById('currentMonth');
+                
+                // Update month header
+                const monthNames = [
+                    'January', 'February', 'March', 'April', 'May', 'June',
+                    'July', 'August', 'September', 'October', 'November', 'December'
+                ];
+                monthHeader.textContent = `${monthNames[this.currentDate.getMonth()]} ${this.currentDate.getFullYear()}`;
+                
+                // Clear calendar
+                calendar.innerHTML = '';
+                
+                // Add day headers
+                const dayHeaders = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                dayHeaders.forEach(day => {
+                    const header = document.createElement('div');
+                    header.className = 'calendar-day-header';
+                    header.textContent = day;
+                    calendar.appendChild(header);
+                });
+                
+                // Get first day of month and number of days
+                const firstDay = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth(), 1);
+                const lastDay = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth() + 1, 0);
+                const startDate = new Date(firstDay);
+                startDate.setDate(startDate.getDate() - firstDay.getDay());
+                
+                // Generate calendar days
+                const today = new Date();
+                for (let i = 0; i < 42; i++) {
+                    const cellDate = new Date(startDate);
+                    cellDate.setDate(startDate.getDate() + i);
+                    
+                    const dayCell = document.createElement('div');
+                    dayCell.className = 'calendar-day';
+                    
+                    if (cellDate.getMonth() !== this.currentDate.getMonth()) {
+                        dayCell.classList.add('other-month');
+                    }
+                    
+                    if (cellDate.toDateString() === today.toDateString()) {
+                        dayCell.classList.add('today');
+                    }
+                    
+                    dayCell.innerHTML = `
+                        <div class="day-number">${cellDate.getDate()}</div>
+                        <div class="day-events" data-date="${cellDate.toISOString().split('T')[0]}"></div>
+                    `;
+                    
+                    calendar.appendChild(dayCell);
+                }
+            }
+            
+            generateWeeklySchedule() {
+                const schedule = document.getElementById('weeklySchedule');
+                const days = ['', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+                const timeSlots = [];
+                
+                // Generate time slots from 8:00 AM to 6:00 PM
+                for (let hour = 8; hour <= 18; hour++) {
+                    timeSlots.push(`${hour.toString().padStart(2, '0')}:00`);
+                }
+                
+                // Clear schedule
+                schedule.innerHTML = '';
+                
+                // Add headers
+                days.forEach(day => {
+                    const header = document.createElement('div');
+                    header.className = 'weekly-header';
+                    header.textContent = day;
+                    schedule.appendChild(header);
+                });
+                
+                // Add time slots and day cells
+                timeSlots.forEach(time => {
+                    // Time label
+                    const timeLabel = document.createElement('div');
+                    timeLabel.className = 'time-slot';
+                    timeLabel.textContent = time;
+                    schedule.appendChild(timeLabel);
+                    
+                    // Day cells
+                    for (let i = 1; i <= 7; i++) {
+                        const dayCell = document.createElement('div');
+                        dayCell.className = 'day-cell';
+                        dayCell.dataset.day = days[i];
+                        dayCell.dataset.time = time;
+                        schedule.appendChild(dayCell);
+                    }
+                });
+            }
+            
+            displayCalendarEvents(events) {
+                // Clear existing events
+                this.clearCalendarEvents();
+                
+                // Group events by course ID to avoid duplicates
+                const eventsByCourse = {};
+                events.forEach(event => {
+                    if (!eventsByCourse[event.id]) {
+                        eventsByCourse[event.id] = {
+                            ...event,
+                            days: [event.day]
+                        };
+                    } else {
+                        // Add day if not already included
+                        if (!eventsByCourse[event.id].days.includes(event.day)) {
+                            eventsByCourse[event.id].days.push(event.day);
+                        }
+                    }
+                });
+                
+                // Group events by day and time slot for weekly view
+                const eventsByDayAndTime = {};
+                events.forEach(event => {
+                    const key = `${event.day}-${event.start_time}`;
+                    if (!eventsByDayAndTime[key]) {
+                        eventsByDayAndTime[key] = [];
+                    }
+                    eventsByDayAndTime[key].push(event);
+                });
+                
+                // Group events by day only to check if we should make them larger
+                const eventsByDay = {};
+                events.forEach(event => {
+                    if (!eventsByDay[event.day]) {
+                        eventsByDay[event.day] = [];
+                    }
+                    // Only count unique courses per day
+                    const existingCourse = eventsByDay[event.day].find(e => e.id === event.id);
+                    if (!existingCourse) {
+                        eventsByDay[event.day].push(event);
+                    }
+                });
+                
+                // Process each unique day-time combination for weekly view
+                Object.values(eventsByDayAndTime).forEach(eventsGroup => {
+                    const event = eventsGroup[0]; // Take the first event (they should all be the same course)
+                    
+                    // Add to weekly view
+                    const dayCell = document.querySelector(`[data-day="${event.day}"][data-time="${event.start_time}"]`);
+                    if (dayCell) {
+                        const eventElement = document.createElement('div');
+                        
+                        // Get program class name for color scheme
+                        const programClass = this.getProgramClass(event.program);
+                        
+                        // Check if this is the only event for this day
+                        const isOnlyEvent = eventsByDay[event.day].length === 1;
+                        
+                        eventElement.className = `course-event ${programClass} ${isOnlyEvent ? 'large' : ''}`;
+                        
+                        // Show course ID and time
+                        eventElement.innerHTML = `
+                            <div class="course-id">${event.id}</div>
+                            <div class="course-time">${event.start_time} - ${event.end_time}</div>
+                        `;
+                        
+                        eventElement.title = `${event.title}\n${event.instructor}\n${event.location}`;
+                        
+                        // Check if this event is part of an overlap
+                        const isOverlapping = this.currentOverlaps.some(overlap => 
+                            overlap.course1.course_id === event.id || overlap.course2.course_id === event.id
+                        );
+                        
+                        if (isOverlapping) {
+                            eventElement.classList.add('overlap');
+                        }
+                        
+                        dayCell.appendChild(eventElement);
+                    }
+                });
+                
+                // Add to monthly view - only one badge per course with time info
+                this.addEventsToMonthlyView(Object.values(eventsByCourse));
+            }
+            
+            addEventsToMonthlyView(events) {
+                // Add events to monthly calendar view
+                events.forEach(event => {
+                    // For each day this course occurs
+                    event.days.forEach(day => {
+                        // Find all day containers that match this day of the week
+                        const dayIndex = this.getDayIndex(day);
+                        const dayElements = document.querySelectorAll('.calendar-day');
+                        
+                        dayElements.forEach(dayElement => {
+                            const dayEventsContainer = dayElement.querySelector('.day-events');
+                            if (dayEventsContainer) {
+                                // Get the date for this calendar cell
+                                const dayNumber = parseInt(dayElement.querySelector('.day-number').textContent);
+                                const cellDate = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth(), dayNumber);
+                                
+                                // Check if this cell represents the correct day of the week
+                                if (cellDate.getDay() === dayIndex && !dayElement.classList.contains('other-month')) {
+                                    // Check if this event is already added to this day
+                                    const existingEvent = dayEventsContainer.querySelector(`[data-course-id="${event.id}"]`);
+                                    if (!existingEvent) {
+                                        const eventBadge = document.createElement('div');
+                                        const programClass = this.getProgramClass(event.program);
+                                        eventBadge.className = `badge me-1 mb-1 ${programClass}`;
+                                        eventBadge.style.fontSize = '0.6em';
+                                        eventBadge.style.display = 'block';
+                                        eventBadge.style.marginBottom = '2px';
+                                        eventBadge.dataset.courseId = event.id;
+                                        eventBadge.innerHTML = `
+                                            <div style="font-weight: bold;">${event.id}</div>
+                                            <div style="font-size: 0.8em; opacity: 0.9;">${event.start_time}</div>
+                                        `;
+                                        eventBadge.title = `${event.title}\n${event.start_time} - ${event.end_time}\n${event.instructor}\n${event.location}`;
+                                        
+                                        // Check if this event is part of an overlap
+                                        const isOverlapping = this.currentOverlaps.some(overlap => 
+                                            overlap.course1.course_id === event.id || overlap.course2.course_id === event.id
+                                        );
+                                        
+                                        if (isOverlapping) {
+                                            eventBadge.style.border = '2px solid #dc3545';
+                                            eventBadge.style.animation = 'pulse 1s infinite';
+                                        }
+                                        
+                                        dayEventsContainer.appendChild(eventBadge);
+                                    }
+                                }
+                            }
+                        });
+                    });
+                });
+            }
+            
+            getDayIndex(dayName) {
+                const days = {
+                    'Sunday': 0,
+                    'Monday': 1,
+                    'Tuesday': 2,
+                    'Wednesday': 3,
+                    'Thursday': 4,
+                    'Friday': 5,
+                    'Saturday': 6
+                };
+                return days[dayName] || 0;
+            }
+            
+            getProgramClass(program) {
+                // Convert program name to CSS class
+                return 'program-' + program.toLowerCase().replace(/\s+/g, '-');
+            }
+            
+            clearCalendarEvents() {
+                document.querySelectorAll('.course-event').forEach(event => event.remove());
+                document.querySelectorAll('.day-events .badge').forEach(badge => badge.remove());
+            }
+            
+            displayOverlapWarnings(overlaps) {
+                this.currentOverlaps = overlaps;
+                const container = document.getElementById('overlapWarnings');
+                
+                if (overlaps.length === 0) {
+                    container.innerHTML = '';
+                    return;
+                }
+                
+                container.innerHTML = `
+                    <div class="alert alert-warning mt-3">
+                        <h6><i class="fas fa-exclamation-triangle me-2"></i>Schedule Conflicts</h6>
+                        ${overlaps.map(overlap => `
+                            <div class="overlap-warning">
+                                <strong>Time Conflict:</strong><br>
+                                ${overlap.course1.course_id} (${overlap.course1.course_name})<br>
+                                <strong>overlaps with</strong><br>
+                                ${overlap.course2.course_id} (${overlap.course2.course_name})
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+            
+            clearOverlapWarnings() {
+                document.getElementById('overlapWarnings').innerHTML = '';
+                this.currentOverlaps = [];
+            }
+        }
+        
+        // Initialize the application
+        let scheduler; // Global variable for access from HTML
+        document.addEventListener('DOMContentLoaded', () => {
+            scheduler = new CourseScheduler();
+        });
+    </script>
+</body>
+</html>
