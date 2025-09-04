@@ -92,6 +92,13 @@ If you need to set environment variables:
 2. **App won't start**: Verify startup command is set to `gunicorn app:app`
 3. **Module not found**: Ensure all dependencies are in `requirements.txt`
 4. **Static files not loading**: Check that static file paths are correct
+5. **NumPy/Pandas compatibility error**: This is fixed with the specific versions in `requirements.txt`
+
+### NumPy/Pandas Compatibility Fix:
+If you encounter the error: `ValueError: numpy.dtype size changed, may indicate binary incompatibility`, this has been resolved by:
+- Using numpy==1.24.4 and pandas==1.5.3 (compatible versions)
+- Installing numpy first in the startup script
+- Using Python 3.11.5 runtime
 
 ### View Logs:
 ```bash

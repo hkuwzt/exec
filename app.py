@@ -158,6 +158,8 @@ class CourseScheduler:
                     'location': course['location'],
                     'start_time': course['start_time'],
                     'end_time': course['end_time'],
+                    'start_date': course['start_date'],
+                    'end_date': course['end_date'],
                     'day': day,
                     'credits': course['credits'],
                     'program': course['program']

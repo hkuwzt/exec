@@ -77,53 +77,59 @@
         
         .time-slot {
             background-color: #f8f9fa;
-            padding: 10px 5px;
+            padding: 8px 5px;
             text-align: center;
-            font-size: 0.8em;
+            font-size: 0.7em;
             border-right: 1px solid #dee2e6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
         .day-cell {
             background-color: white;
-            min-height: 60px;
-            padding: 5px;
+            min-height: 40px;
+            padding: 2px;
             position: relative;
+            font-size: 0.8em;
         }
         
         .weekly-header {
             background-color: #495057;
             color: white;
-            padding: 10px;
+            padding: 8px;
             text-align: center;
             font-weight: bold;
+            font-size: 0.9em;
         }
         
         .course-event {
             color: white;
-            padding: 8px 12px;
-            margin: 2px 0;
-            border-radius: 6px;
-            font-size: 0.85em;
+            padding: 4px 8px;
+            margin: 1px 0;
+            border-radius: 4px;
+            font-size: 0.75em;
             cursor: pointer;
             position: relative;
-            min-height: 50px;
+            min-height: 35px;
             display: flex;
             flex-direction: column;
             justify-content: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             transition: all 0.3s ease;
             text-align: center;
+            line-height: 1.2;
         }
         
         .course-event:hover {
             transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            box-shadow: 0 3px 6px rgba(0,0,0,0.15);
         }
         
         .course-event.large {
-            padding: 12px 16px;
-            font-size: 0.95em;
-            min-height: 70px;
+            padding: 6px 10px;
+            font-size: 0.85em;
+            min-height: 50px;
             font-weight: 500;
         }
         
@@ -486,10 +492,16 @@
                 );
                 
                 container.innerHTML = selectedCoursesList.map(course => `
-                    <div class="mb-2 p-2 bg-light rounded d-flex justify-content-between align-items-center">
+                    <div class="mb-2 p-2 bg-light rounded d-flex justify-content-between align-items-start">
                         <div>
                             <div class="fw-bold">${course.course_id}</div>
                             <div class="small text-muted">${course.course_name}</div>
+                            <div class="small text-primary">
+                                <i class="fas fa-clock me-1"></i>${course.start_time} - ${course.end_time}
+                            </div>
+                            <div class="small text-secondary">
+                                <i class="fas fa-calendar-day me-1"></i>${course.days}
+                            </div>
                         </div>
                         <button class="btn btn-outline-danger btn-sm" onclick="scheduler.toggleCourse('${course.course_id}')">
                             <i class="fas fa-times"></i>
@@ -580,9 +592,12 @@
                 const days = ['', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
                 const timeSlots = [];
                 
-                // Generate time slots from 8:00 AM to 6:00 PM
-                for (let hour = 8; hour <= 18; hour++) {
+                // Generate time slots from 8:00 AM to 7:00 PM in 30-minute intervals
+                for (let hour = 8; hour <= 19; hour++) {
                     timeSlots.push(`${hour.toString().padStart(2, '0')}:00`);
+                    if (hour < 19) { // Don't add :30 for the last hour
+                        timeSlots.push(`${hour.toString().padStart(2, '0')}:30`);
+                    }
                 }
                 
                 // Clear schedule
@@ -662,9 +677,15 @@
                 Object.values(eventsByDayAndTime).forEach(eventsGroup => {
                     const event = eventsGroup[0]; // Take the first event (they should all be the same course)
                     
-                    // Add to weekly view
-                    const dayCell = document.querySelector(`[data-day="${event.day}"][data-time="${event.start_time}"]`);
+                    // Add to weekly view - find the correct starting time slot
+                    const startTimeSlot = this.findTimeSlot(event.start_time);
+                    const dayCell = document.querySelector(`[data-day="${event.day}"][data-time="${startTimeSlot}"]`);
+                    
                     if (dayCell) {
+                        // Calculate how many time slots this event should span
+                        const duration = this.calculateCourseDuration(event.start_time, event.end_time);
+                        const slotsToSpan = Math.ceil(duration / 30); // 30 minutes per slot
+                        
                         const eventElement = document.createElement('div');
                         
                         // Get program class name for color scheme
@@ -674,6 +695,17 @@
                         const isOnlyEvent = eventsByDay[event.day].length === 1;
                         
                         eventElement.className = `course-event ${programClass} ${isOnlyEvent ? 'large' : ''}`;
+                        
+                        // Set the height to span multiple time slots and position absolutely
+                        const baseHeight = 40; // Base height of each time slot
+                        const totalHeight = (baseHeight * slotsToSpan) + ((slotsToSpan - 1) * 1); // Add 1px for each border
+                        eventElement.style.height = `${totalHeight}px`;
+                        eventElement.style.minHeight = `${totalHeight}px`;
+                        eventElement.style.position = 'absolute';
+                        eventElement.style.top = '0';
+                        eventElement.style.left = '2px';
+                        eventElement.style.right = '2px';
+                        eventElement.style.zIndex = '10';
                         
                         // Show course ID and time
                         eventElement.innerHTML = `
@@ -693,6 +725,13 @@
                         }
                         
                         dayCell.appendChild(eventElement);
+                        
+                        // Mark the covered time slots as occupied (just mark them, don't grey them out)
+                        this.markTimeSlotsCovered(event.day, startTimeSlot, slotsToSpan);
+                        
+                    } else {
+                        // If the exact time slot doesn't exist, find the closest one or create a flexible placement
+                        this.placeEventInWeeklyView(event, eventsByDay);
                     }
                 });
                 
@@ -716,35 +755,38 @@
                                 const dayNumber = parseInt(dayElement.querySelector('.day-number').textContent);
                                 const cellDate = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth(), dayNumber);
                                 
-                                // Check if this cell represents the correct day of the week
+                                // Check if this cell represents the correct day of the week and is in current month
                                 if (cellDate.getDay() === dayIndex && !dayElement.classList.contains('other-month')) {
-                                    // Check if this event is already added to this day
-                                    const existingEvent = dayEventsContainer.querySelector(`[data-course-id="${event.id}"]`);
-                                    if (!existingEvent) {
-                                        const eventBadge = document.createElement('div');
-                                        const programClass = this.getProgramClass(event.program);
-                                        eventBadge.className = `badge me-1 mb-1 ${programClass}`;
-                                        eventBadge.style.fontSize = '0.6em';
-                                        eventBadge.style.display = 'block';
-                                        eventBadge.style.marginBottom = '2px';
-                                        eventBadge.dataset.courseId = event.id;
-                                        eventBadge.innerHTML = `
-                                            <div style="font-weight: bold;">${event.id}</div>
-                                            <div style="font-size: 0.8em; opacity: 0.9;">${event.start_time}</div>
-                                        `;
-                                        eventBadge.title = `${event.title}\n${event.start_time} - ${event.end_time}\n${event.instructor}\n${event.location}`;
-                                        
-                                        // Check if this event is part of an overlap
-                                        const isOverlapping = this.currentOverlaps.some(overlap => 
-                                            overlap.course1.course_id === event.id || overlap.course2.course_id === event.id
-                                        );
-                                        
-                                        if (isOverlapping) {
-                                            eventBadge.style.border = '2px solid #dc3545';
-                                            eventBadge.style.animation = 'pulse 1s infinite';
+                                    // Check if the cell date is within the course date range
+                                    if (this.isDateInCourseRange(cellDate, event)) {
+                                        // Check if this event is already added to this day
+                                        const existingEvent = dayEventsContainer.querySelector(`[data-course-id="${event.id}"]`);
+                                        if (!existingEvent) {
+                                            const eventBadge = document.createElement('div');
+                                            const programClass = this.getProgramClass(event.program);
+                                            eventBadge.className = `badge me-1 mb-1 ${programClass}`;
+                                            eventBadge.style.fontSize = '0.6em';
+                                            eventBadge.style.display = 'block';
+                                            eventBadge.style.marginBottom = '2px';
+                                            eventBadge.dataset.courseId = event.id;
+                                            eventBadge.innerHTML = `
+                                                <div style="font-weight: bold;">${event.id}</div>
+                                                <div style="font-size: 0.8em; opacity: 0.9;">${event.start_time}-${event.end_time}</div>
+                                            `;
+                                            eventBadge.title = `${event.title}\n${event.start_time} - ${event.end_time}\n${event.instructor}\n${event.location}`;
+                                            
+                                            // Check if this event is part of an overlap
+                                            const isOverlapping = this.currentOverlaps.some(overlap => 
+                                                overlap.course1.course_id === event.id || overlap.course2.course_id === event.id
+                                            );
+                                            
+                                            if (isOverlapping) {
+                                                eventBadge.style.border = '2px solid #dc3545';
+                                                eventBadge.style.animation = 'pulse 1s infinite';
+                                            }
+                                            
+                                            dayEventsContainer.appendChild(eventBadge);
                                         }
-                                        
-                                        dayEventsContainer.appendChild(eventBadge);
                                     }
                                 }
                             }
@@ -766,6 +808,125 @@
                 return days[dayName] || 0;
             }
             
+            isDateInCourseRange(date, event) {
+                // Parse the start and end dates from the event data
+                const startDate = new Date(event.start_date);
+                const endDate = new Date(event.end_date);
+                
+                // Normalize dates to compare only year, month, and day (ignore time)
+                const checkDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+                const courseStartDate = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+                const courseEndDate = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
+                
+                return checkDate >= courseStartDate && checkDate <= courseEndDate;
+            }
+            
+            calculateCourseDuration(startTime, endTime) {
+                // Parse time strings (format: "HH:MM")
+                const [startHour, startMin] = startTime.split(':').map(Number);
+                const [endHour, endMin] = endTime.split(':').map(Number);
+                
+                const startMinutes = startHour * 60 + startMin;
+                const endMinutes = endHour * 60 + endMin;
+                
+                return endMinutes - startMinutes; // Return duration in minutes
+            }
+            
+            placeEventInWeeklyView(event, eventsByDay) {
+                // Find the closest available time slot or create a flexible placement
+                const dayColumns = document.querySelectorAll(`[data-day="${event.day}"]`);
+                
+                if (dayColumns.length > 0) {
+                    // Try to find a time slot close to the event's start time
+                    const eventStartHour = parseInt(event.start_time.split(':')[0]);
+                    let bestCell = null;
+                    let minTimeDiff = Infinity;
+                    
+                    dayColumns.forEach(cell => {
+                        if (cell.dataset.time) {
+                            const cellHour = parseInt(cell.dataset.time.split(':')[0]);
+                            const timeDiff = Math.abs(cellHour - eventStartHour);
+                            
+                            if (timeDiff < minTimeDiff) {
+                                minTimeDiff = timeDiff;
+                                bestCell = cell;
+                            }
+                        }
+                    });
+                    
+                    if (bestCell) {
+                        const eventElement = document.createElement('div');
+                        const programClass = this.getProgramClass(event.program);
+                        const isOnlyEvent = eventsByDay[event.day].length === 1;
+                        
+                        eventElement.className = `course-event ${programClass} ${isOnlyEvent ? 'large' : ''}`;
+                        eventElement.style.border = '2px dashed #ffc107'; // Yellow dashed border to indicate approximate placement
+                        
+                        const duration = this.calculateCourseDuration(event.start_time, event.end_time);
+                        const heightMultiplier = Math.max(1, Math.floor(duration / 60));
+                        eventElement.style.minHeight = `${50 * heightMultiplier}px`;
+                        
+                        eventElement.innerHTML = `
+                            <div class="course-id">${event.id}</div>
+                            <div class="course-time">${event.start_time} - ${event.end_time}</div>
+                            <div style="font-size: 0.7em; opacity: 0.8;">~Approx. time</div>
+                        `;
+                        
+                        eventElement.title = `${event.title}\n${event.start_time} - ${event.end_time}\n${event.instructor}\n${event.location}\n(Approximate placement)`;
+                        
+                        bestCell.appendChild(eventElement);
+                    }
+                }
+            }
+            
+            findTimeSlot(timeString) {
+                // Convert time string to find the exact or closest 30-minute slot
+                const [hours, minutes] = timeString.split(':').map(Number);
+                
+                // Round to nearest 30-minute interval
+                let roundedMinutes = 0;
+                if (minutes >= 15 && minutes < 45) {
+                    roundedMinutes = 30;
+                } else if (minutes >= 45) {
+                    return `${String(hours + 1).padStart(2, '0')}:00`;
+                }
+                
+                return `${String(hours).padStart(2, '0')}:${String(roundedMinutes).padStart(2, '0')}`;
+            }
+            
+            markTimeSlotsCovered(day, startTimeSlot, slotsToSpan) {
+                // Find all time slots that should be covered by this event
+                const allTimeSlots = this.generateTimeSlotsList();
+                const startIndex = allTimeSlots.indexOf(startTimeSlot);
+                
+                if (startIndex !== -1) {
+                    // Mark subsequent slots as covered (just add attribute, don't change appearance)
+                    for (let i = 1; i < slotsToSpan; i++) {
+                        const slotIndex = startIndex + i;
+                        if (slotIndex < allTimeSlots.length) {
+                            const timeSlot = allTimeSlots[slotIndex];
+                            const cell = document.querySelector(`[data-day="${day}"][data-time="${timeSlot}"]`);
+                            if (cell && !cell.hasAttribute('data-covered')) {
+                                cell.setAttribute('data-covered', 'true');
+                                // Don't change the visual appearance - let the course event span over it
+                            }
+                        }
+                    }
+                }
+            }
+            
+            generateTimeSlotsList() {
+                // Generate the same time slots as in generateWeeklySchedule
+                const timeSlots = [];
+                for (let hour = 8; hour <= 19; hour++) {
+                    timeSlots.push(`${hour.toString().padStart(2, '0')}:00`);
+                    if (hour < 19) {
+                        timeSlots.push(`${hour.toString().padStart(2, '0')}:30`);
+                    }
+                }
+                return timeSlots;
+            }
+            
             getProgramClass(program) {
                 // Convert program name to CSS class
                 return 'program-' + program.toLowerCase().replace(/\s+/g, '-');
@@ -774,6 +935,11 @@
             clearCalendarEvents() {
                 document.querySelectorAll('.course-event').forEach(event => event.remove());
                 document.querySelectorAll('.day-events .badge').forEach(badge => badge.remove());
+                
+                // Clear covered time slots markers
+                document.querySelectorAll('[data-covered="true"]').forEach(cell => {
+                    cell.removeAttribute('data-covered');
+                });
             }
             
             displayOverlapWarnings(overlaps) {
