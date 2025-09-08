@@ -613,6 +613,15 @@
                         const params = new URLSearchParams();
                         courseIds.forEach(id => params.append('courses', id));
                         
+                        // Track the export activity first
+                        const trackParams = new URLSearchParams();
+                        courseIds.forEach(id => trackParams.append('courses', id));
+                        trackParams.append('format', 'ics');
+                        
+                        fetch(`/api/track/export?${trackParams}`).catch(error => {
+                            console.log('Tracking error (non-critical):', error);
+                        });
+                        
                         const response = await fetch(`/api/calendar?${params}`);
                         const data = await response.json();
                         
