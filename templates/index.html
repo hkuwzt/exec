@@ -85,12 +85,12 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 40px;
+            height: 20px;
         }
         
         .day-cell {
             background-color: white;
-            height: 40px;
+            height: 20px;
             padding: 2px;
             position: relative;
             font-size: 0.8em;
@@ -270,6 +270,22 @@
         .remove-course-btn:hover {
             background-color: #c82333;
         }
+        
+        /* Program type color badges for selected courses */
+        .program-badge.program-core-courses {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .program-badge.program-elective-courses {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            color: white;
+        }
+
+        .program-badge.program-other-events {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -280,7 +296,7 @@
                     <div class="container-fluid">
                         <span class="navbar-brand mb-0 h1">
                             <i class="fas fa-calendar-alt me-2"></i>
-                            MBA Course Schedule Manager
+                            HKU MBA Courses Schedule Planner
                         </span>
                     </div>
                 </nav>
@@ -311,7 +327,7 @@
                     </div>
                     <div id="exportButtonContainer" class="card-footer d-none">
                         <button id="exportToGCal" class="btn btn-success w-100">
-                            <i class="fas fa-calendar-plus me-2"></i>Export to Google Calendar
+                            <i class="fas fa-calendar-plus me-2"></i>Export to Calendar
                         </button>
                     </div>
                 </div>
@@ -333,7 +349,6 @@
                                 </div>
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                                 <button type="button" class="btn btn-primary" id="confirmCourseSelection">Confirm</button>
                             </div>
                         </div>
@@ -385,20 +400,22 @@
                         
                         <!-- Weekly Schedule View -->
                         <div id="weekView" class="d-none">
-                            <div class="calendar-header mb-3">
-                                <button class="btn btn-outline-light btn-sm" id="prevWeek">
-                                    <i class="fas fa-chevron-left"></i>
-                                </button>
-                                <div class="calendar-nav">
-                                    <h5 id="currentWeek" class="mb-0"></h5>
-                                    <button class="btn btn-outline-light btn-sm" id="todayBtnWeek">Today</button>
+                            <div class="calendar-container">
+                                <div class="calendar-header">
+                                    <button class="btn btn-outline-light btn-sm" id="prevWeek">
+                                        <i class="fas fa-chevron-left"></i>
+                                    </button>
+                                    <div class="calendar-nav">
+                                        <h5 id="currentWeek" class="mb-0"></h5>
+                                        <button class="btn btn-outline-light btn-sm" id="todayBtnWeek">Today</button>
+                                    </div>
+                                    <button class="btn btn-outline-light btn-sm" id="nextWeek">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </button>
                                 </div>
-                                <button class="btn btn-outline-light btn-sm" id="nextWeek">
-                                    <i class="fas fa-chevron-right"></i>
-                                </button>
-                            </div>
-                            <div id="weeklySchedule" class="weekly-schedule">
-                                <!-- Weekly schedule will be generated here -->
+                                <div id="weeklySchedule" class="weekly-schedule">
+                                    <!-- Weekly schedule will be generated here -->
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -551,7 +568,13 @@
                     `;
 
                     // Add courses for this program
+                    const coursesContainer = document.createElement('div');
+                    coursesContainer.className = 'row g-3'; // Bootstrap grid with gap
+                    
                     courses.forEach(course => {
+                        const courseCol = document.createElement('div');
+                        courseCol.className = 'col-md-4'; // Three columns per row
+                        
                         const courseCard = document.createElement('div');
                         courseCard.className = `course-card ${this.selectedCourses.has(course.course_id) ? 'selected' : ''}`;
                         courseCard.dataset.courseId = course.course_id;
@@ -568,8 +591,11 @@
                         `;
                         
                         courseCard.addEventListener('click', () => this.toggleCourse(course.course_id));
-                        section.appendChild(courseCard);
+                        courseCol.appendChild(courseCard);
+                        coursesContainer.appendChild(courseCol);
                     });
+                    
+                    section.appendChild(coursesContainer);
                     
                     courseList.appendChild(section);
                 });
@@ -753,8 +779,10 @@
                             <div class="small text-secondary">
                                 <i class="fas fa-map-marker-alt me-1"></i>${course.location}
                             </div>
-                            <div class="small text-info">
-                                <i class="fas fa-graduation-cap me-1"></i>${course.program}
+                            <div class="small">
+                                <span class="badge program-badge ${this.getProgramClass(course.program)} me-1">
+                                    <i class="fas fa-graduation-cap me-1"></i>${course.program}
+                                </span>
                             </div>
                         </div>
                         <button class="btn btn-outline-danger btn-sm" onclick="scheduler.toggleCourse('${course.course_id}')">
@@ -821,39 +849,43 @@
                                 dayElement.appendChild(eventBadge);
                             }
                         } else {
-                            // Add to weekly view - match by both day and date
-                            const eventDate = new Date(event.date);
+                            // Add to weekly view - match by both time and date
+                            const startTimeSlot = this.findTimeSlot(event.start_time);
                             const cells = document.querySelectorAll('.day-cell');
+                            
                             cells.forEach(cell => {
-                                const cellDate = new Date(cell.dataset.date);
-                                if (cell.dataset.time === event.start_time && 
-                                    cellDate.toISOString().split('T')[0] === event.date) {
+                                if (cell.dataset.time === startTimeSlot && 
+                                    cell.dataset.date === event.date) {
+                                    
                                     const eventElement = document.createElement('div');
                                     const programClass = this.getProgramClass(event.program);
                                     eventElement.className = `course-event ${programClass}`;
                                     
-                                    const start = new Date(`2000-01-01 ${event.start_time}`);
-                                    const end = new Date(`2000-01-01 ${event.end_time}`);
-                                    const durationMinutes = (end - start) / (1000 * 60);
-                                    const heightInPixels = (durationMinutes / 30) * 40;
+                                    // Calculate duration and height based on actual event duration
+                                    const durationMinutes = this.calculateCourseDuration(event.start_time, event.end_time);
+                                    // Each 30-minute slot is 20px high, so calculate proportional height
+                                    const heightInPixels = Math.max(20, (durationMinutes / 30) * 20);
                                     
                                     eventElement.style.height = `${heightInPixels}px`;
                                     eventElement.style.position = 'absolute';
+                                    eventElement.style.top = '0';
                                     eventElement.style.zIndex = '10';
                                     
-                        // Handle multiple events in the same time slot
-                        const existingEvents = Array.from(cell.querySelectorAll('.course-event'));
-                        const totalEvents = existingEvents.length + 1;
-                        const width = 90 / totalEvents; // Leave some margin
-                        
-                        // Update all events including the new one
-                        existingEvents.forEach((existing, index) => {
-                            existing.style.width = `${width}%`;
-                            existing.style.left = `${(index * width) + 5}%`; // Add 5% left margin
-                        });
-                        
-                        eventElement.style.width = `${width}%`;
-                        eventElement.style.left = `${(existingEvents.length * width) + 5}%`;                                    eventElement.innerHTML = `
+                                    // Handle multiple events in the same time slot
+                                    const existingEvents = Array.from(cell.querySelectorAll('.course-event'));
+                                    const totalEvents = existingEvents.length + 1;
+                                    const width = 90 / totalEvents; // Leave some margin
+                                    
+                                    // Update existing events width and position
+                                    existingEvents.forEach((existing, index) => {
+                                        existing.style.width = `${width}%`;
+                                        existing.style.left = `${(index * width) + 5}%`;
+                                    });
+                                    
+                                    eventElement.style.width = `${width}%`;
+                                    eventElement.style.left = `${(existingEvents.length * width) + 5}%`;
+                                    
+                                    eventElement.innerHTML = `
                                         <div class="course-id">${event.id}</div>
                                         <div class="course-time">${event.start_time} - ${event.end_time}</div>
                                     `;
@@ -1057,7 +1089,7 @@
                         eventElement.className = `course-event ${programClass} ${isOnlyEvent ? 'large' : ''}`;
                         
                         // Set the height to span multiple time slots and position absolutely
-                        const baseHeight = 40; // Base height of each time slot
+                        const baseHeight = 20; // Base height of each time slot
                         const totalHeight = (baseHeight * slotsToSpan) + ((slotsToSpan - 1) * 1); // Add 1px for each border
                         eventElement.style.height = `${totalHeight}px`;
                         eventElement.style.minHeight = `${totalHeight}px`;
