@@ -1,4 +1,4 @@
-# Course Schedule Manager
+# MBA Course Schedule Manager
 
 A dynamic Flask web application for managing course schedules with visual calendar interface and conflict detection.
 
@@ -64,3 +64,55 @@ Course information is stored in `courses.csv` with the following columns:
 - **Frontend**: Bootstrap 5, JavaScript
 - **Data**: Pandas for CSV processing
 - **Deployment**: Gunicorn for Azure App Service
+
+# MBA Course Schedule Manager - Deployment Guide
+
+## Files for Cloud Deployment
+
+This application is ready for deployment on cloud platforms like Heroku, Railway, or Render.
+
+### Required Files:
+- `requirements.txt` - Python dependencies
+- `Procfile` - Tells the platform how to run your app
+- `runtime.txt` - Specifies Python version
+- `app.py` - Main application file
+- `templates/index.html` - Frontend template
+- `courses_info.csv` - Course information data
+- `course_sessions.csv` - Course session data
+
+### Deployment Steps:
+
+#### For Heroku:
+1. Install Heroku CLI
+2. Login: `heroku login`
+3. Create app: `heroku create your-app-name`
+4. Deploy: `git push heroku main`
+
+#### For Railway:
+1. Connect your GitHub repository
+2. Railway will auto-detect and deploy
+
+#### For Render:
+1. Connect your GitHub repository
+2. Select "Web Service"
+3. Use build command: `pip install -r requirements.txt`
+4. Use start command: `python app.py`
+
+### Environment Variables:
+- `PORT` - Automatically set by most platforms
+- No additional environment variables required
+
+### Features:
+- SQLite database (automatically created)
+- Request logging and analytics
+- User activity tracking
+- Responsive design
+- Calendar export functionality
+
+### Access Points:
+- `/` - Main application
+- `/stats/dashboard` - Analytics dashboard
+- `/api/courses` - API endpoint for courses
+- `/api/calendar` - API endpoint for calendar events
+
+The application will work even without CSV files by showing an empty interface.

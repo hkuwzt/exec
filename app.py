@@ -81,7 +81,11 @@ def log_user_activity(activity_type, details=None):
 
 # Create tables within application context
 with app.app_context():
-    db.create_all()
+    try:
+        db.create_all()
+        print("Database tables created successfully")
+    except Exception as e:
+        print(f"Error creating database tables: {e}")
 
 class CourseScheduler:
     def __init__(self, courses_info='courses_info.csv', course_sessions='course_sessions.csv'):
@@ -93,19 +97,27 @@ class CourseScheduler:
     def load_courses_info(self):
         """Load basic course information from CSV file"""
         try:
+            if not os.path.exists(self.courses_info_file):
+                print(f"Warning: {self.courses_info_file} not found, creating empty DataFrame")
+                return pd.DataFrame(columns=['course_id', 'course_name', 'instructor', 'location', 'program'])
             return pd.read_csv(self.courses_info_file)
-        except FileNotFoundError:
-            raise FileNotFoundError(f"Course information file {self.courses_info_file} not found")
+        except Exception as e:
+            print(f"Error loading course info: {e}")
+            return pd.DataFrame(columns=['course_id', 'course_name', 'instructor', 'location', 'program'])
     
     def load_course_sessions(self):
         """Load course sessions from CSV file"""
         try:
+            if not os.path.exists(self.course_sessions_file):
+                print(f"Warning: {self.course_sessions_file} not found, creating empty DataFrame")
+                return pd.DataFrame(columns=['course_id', 'date', 'start_time', 'end_time'])
             df = pd.read_csv(self.course_sessions_file)
             df['start_datetime'] = pd.to_datetime(df['date'] + ' ' + df['start_time'])
             df['end_datetime'] = pd.to_datetime(df['date'] + ' ' + df['end_time'])
             return df
-        except FileNotFoundError:
-            raise FileNotFoundError(f"Course sessions file {self.course_sessions_file} not found")
+        except Exception as e:
+            print(f"Error loading course sessions: {e}")
+            return pd.DataFrame(columns=['course_id', 'date', 'start_time', 'end_time', 'start_datetime', 'end_datetime'])
     
     def get_all_courses(self):
         """Return all courses as a list of dictionaries"""
@@ -120,7 +132,13 @@ class CourseScheduler:
     
     def get_programs(self):
         """Get all unique programs"""
-        return sorted(self.courses_info_df['program'].unique().tolist())
+        try:
+            if self.courses_info_df.empty:
+                return ['Core Courses', 'Elective Courses', 'Other Events']  # Default programs
+            return sorted(self.courses_info_df['program'].unique().tolist())
+        except Exception as e:
+            print(f"Error getting programs: {e}")
+            return ['Core Courses', 'Elective Courses', 'Other Events']
     
     def find_overlapping_courses(self, selected_courses):
         """Find courses that have time conflicts"""
@@ -189,8 +207,25 @@ class CourseScheduler:
         return events
 
 
-# Initialize the course scheduler
-scheduler = CourseScheduler()
+# Initialize the course scheduler with error handling
+try:
+    scheduler = CourseScheduler()
+    print("Course scheduler initialized successfully")
+except Exception as e:
+    print(f"Error initializing course scheduler: {e}")
+    # Create a dummy scheduler with empty data
+    class DummyScheduler:
+        def get_programs(self):
+            return ['Core Courses', 'Elective Courses', 'Other Events']
+        def get_all_courses(self):
+            return []
+        def get_courses_by_program(self, program):
+            return []
+        def get_calendar_events(self, course_ids):
+            return []
+        def find_overlapping_courses(self, courses):
+            return []
+    scheduler = DummyScheduler()
 
 @app.route('/')
 def index():
