@@ -1,15 +1,59 @@
 course_id,course_name,instructor,program,location
-PMBA6013,Accounting for Business Decisions,Prof. Xu Li,Core Courses,Cyberport
-PMBA2963,Managerial Economics,Prof. Wen Zhou,Core Courses,Cyberport
-PMBA6099,Executive Development Workshop,Prof. Roy Liang Tan,Core Courses,Cyberport
-PMBA6091,Advanced Negotiation (I),Dr. Grace Xie,Elective Courses,Town Centre
-PMBA6100,Decoding Branding in the New Era,Dr. Royce Yuen,Elective Courses,Town Centre
-PMBA6127,Doing Business in the Multipolar World,Dr. Marcus Schuetz,Elective Courses,Town Centre
-PMBA6016,Management Consulting for Consultants and Managers,Dr. Marcus Schuetz,Elective Courses,Town Centre
-PMBA6003,Corporate Finance,Prof. Alex Chan,Core Courses,Cyberport
-PMBA6097,Managing Digital Innovation,Prof. Yulin Fang,Core Courses,Cyberport
-PMBA6011,Competitive Strategy,Prof. Fabrice Lumineau,Core Courses,Cyberport
-PMBA6096,Ethics and ESG: Building Sustainable Businesses,Prof. David Bishop,Core Courses,Cyberport
 OTHER001,Career Fair,Not Applicable,Other Events,Hong Kong
 OTHER002,CDT Communication Series,Not Applicable,Other Events,Town Centre
 OTHER003,CDT Impromptu Speaking Mastery,Not Applicable,Other Events,Town Centre
+MFIN7054,Introduction to Cryptocurrencies and Digital Assets,Prof. Henri Arslanian,Elective Courses,Unspecified
+PMBA2246,Supply Chain Management,Prof. Benjamin Yen,Elective Courses,Unspecified
+PMBA2963,Managerial Economics,Prof. Wen Zhou,Core Courses,Cyberport
+PMBA6003,Corporate Finance,Prof. Alex Chan,Core Courses,Town Centre
+PMBA6011,Competitive Strategy,Prof. Fabrice Lumineau,Core Courses,Town Centre
+PMBA6013,Accounting for Business Decisions,Prof. Xu Li,Core Courses,Unspecified
+PMBA6016,Management Consulting for Consultants and Managers,Dr. Marcus Schuetz,Elective Courses,Unspecified
+PMBA6027,Business Valuation,Prof. Xu Li,Elective Courses,Unspecified
+PMBA6027,Business Valuation (SZ),Prof. Xu Li,Elective Courses,Shenzhen
+PMBA6032,Global Marketing Management,Ms. Virginia Morris,Elective Courses,Unspecified
+PMBA6036,Advanced Corporate Finance,Dr. Maurice Tse,Elective Courses,Unspecified
+PMBA6037,Derivatives and Structured Finance,Dr. Maurice Tse,Elective Courses,Unspecified
+PMBA6045-SZ,Online Business Strategy (SZ),Prof. Eric Chin,Elective Courses,Shenzhen
+PMBA6045,Online Business Strategy,Prof. Eric Chin,Elective Courses,Unspecified
+PMBA6046,Legal Environment in Asia,Prof. David Bishop,Elective Courses,Unspecified
+PMBA6048,Ventures Capital and Private Equity,Prof. Marvin Lai,Elective Courses,Unspecified
+PMBA6048-SZ,Ventures Capital and Private Equity (SZ),Prof. Marvin Lai,Elective Courses,Shenzhen
+PMBA6060,Entrepreneurship and Ventures,Prof. Simon Lam,Elective Courses,Unspecified
+PMBA6061,Business Intelligence and Big Data,Prof. Michael Chau,Elective Courses,Unspecified
+PMBA6062,Real Estate Finance,Dr. Maurice Tse,Elective Courses,Unspecified
+PMBA6068,Capstone Project,Prof. Jin Li & Dr. Yinuo Tang,Core Courses,Cyberport
+PMBA6076,Mergers and Acquisitions (SZ),Prof. Matthias Buehlmaier,Elective Courses,Shenzhen
+PMBA6082,Artificial Intelligence for Business Leaders,Mr. Kevin Pereira,Elective Courses,Unspecified
+PMBA6087,Insight and Lessons - Reflection of a CEO,Prof. Philip Chen,Elective Courses,Unspecified
+PMBA6089,Big Data Consumer Analytics,Prof. Tuan Q. Phan,Elective Courses,Unspecified
+PMBA6091,Advanced Negotiation (I),Dr. Grace Xie,Elective Courses,Town Centre
+PMBA6091-II,Advanced Negotiation (II),Dr. Grace Xie,Elective Courses,Unspecified
+PMBA6093,Analytics for Managers,Prof. Weiming Zhu,Core Courses,Town Centre
+PMBA6094,Macroeconomics: Global Perspective,Prof. Heiwai Tang,Core Courses,Cyberport
+PMBA6096,Ethics and ESG: Building Sustainable Businesses,Prof. David Bishop,Core Courses,Cyberport
+PMBA6097,Managing Digital Innovation,Prof. Yulin Fang,Core Courses,Cyberport
+PMBA6098,Marketing Strategy,Dr. Tingting Fan,Core Courses,Town Centre
+PMBA6099,Executive Development Workshop,Prof. Roy Liang Tan,Core Courses,Cyberport
+PMBA6100,Decoding Branding in the New Era,Dr. Royce Yuen,Elective Courses,Unspecified
+PMBA6104,Entrepreneurial Incubation Lab,Prof. Jack Poon,Elective Courses,Unspecified
+PMBA6110,Managing Black Swans,Prof. Pingyang Gao,Elective Courses,Unspecified
+PMBA6111,"ESG, Sustainable Finance and Impact Investing",Prof. Dragon Tang,Elective Courses,Unspecified
+PMBA6112,Renewable Energy Finance,Prof. Thomas Schmid,Elective Courses,Unspecified
+PMBA6114,Strategic Human Resource Management (SZ),Prof. Helen Hailin Zhao,Elective Courses,Shenzhen
+PMBA6115,Investments and Asset Allocation,Prof. Robert Park,Elective Courses,Unspecified
+PMBA6117,Digital Marketing Strategy,Prof. Jayson Jia,Elective Courses,Unspecified
+PMBA6118,Innovating Healthcare (SZ),Prof. Wei Zhang,Elective Courses,Shenzhen
+PMBA6119,Leadership Development in the Chinese Classics,Dr. Elizabeth Woo Li,Elective Courses,Unspecified
+PMBA6123,Simulation Trading: Bridging Theory and Real-world Trading (SZ),Prof. Tao Wang,Elective Courses,Shenzhen
+PMBA6124,Strategy in a Digital World (I),Prof. Jeffrey Sampler,Elective Courses,Unspecified
+PMBA6124-II,Strategy in a Digital World (II),Prof. Jeffrey Sampler,Elective Courses,Unspecified
+PMBA6125,"Integrated Marketing Strategy: Social Media, Content and Brand",Ms. Suyoung Yoo,Elective Courses,Unspecified
+PMBA6126,"Entrepreneurial Finance: Valuing, Financing, and Exiting Startups",Prof. Alberto Moel,Elective Courses,Unspecified
+PMBA6127,Doing Business in the Multipolar World,Dr. Marcus Schuetz,Elective Courses,Unspecified
+PMBA6128,"Hit Business: Blockbuster, Technology, and Innovation",Prof. Tingting Fan,Elective Courses,Unspecified
+PMBA6129,Culture and Creative Transformation,Ms. Rebecca Woo,Elective Courses,Unspecified
+PMBA6130,FinTech and Innovation in Financial Services,Prof. David Lee,Elective Courses,Unspecified
+PMBA6131,Corporate Fund-Raising Initiatives in the Chinese Equity Market,Prof. Anthony Yang,Elective Courses,Unspecified
+PMBA6132,Integrated Wealth Planning: Family Office and Asset Allocation,Prof. Anthony Yang,Elective Courses,Unspecified
+PMBA6134,AI in Financial Services: Leading Change in the Digital Era,Mr. Alain Le Couedic,Elective Courses,Unspecified
