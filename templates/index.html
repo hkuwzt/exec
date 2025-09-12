@@ -1059,10 +1059,19 @@
                         dayCell.classList.add('today');
                     }
                     
+                    // Format date as YYYY-MM-DD without timezone conversion
+                    const year = cellDate.getFullYear();
+                    const month = String(cellDate.getMonth() + 1).padStart(2, '0');
+                    const day = String(cellDate.getDate()).padStart(2, '0');
+                    const dateString = `${year}-${month}-${day}`;
+                    
                     dayCell.innerHTML = `
                         <div class="day-number">${cellDate.getDate()}</div>
-                        <div class="day-events" data-date="${cellDate.toISOString().split('T')[0]}"></div>
+                        <div class="day-events" data-date="${dateString}"></div>
                     `;
+                    
+                    // Debug: Log the date being set
+                    console.log('Setting calendar cell date:', dateString, 'Day:', cellDate.getDate());
                     
                     calendar.appendChild(dayCell);
                 }
@@ -1119,7 +1128,14 @@
                         dayCell.className = 'day-cell';
                         dayCell.dataset.day = days[i];
                         dayCell.dataset.time = time;
-                        dayCell.dataset.date = currentDate.toISOString().split('T')[0];
+                        
+                        // Format date consistently without timezone conversion
+                        const year = currentDate.getFullYear();
+                        const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+                        const day = String(currentDate.getDate()).padStart(2, '0');
+                        const dateString = `${year}-${month}-${day}`;
+                        dayCell.dataset.date = dateString;
+                        
                         schedule.appendChild(dayCell);
                     }
                 });

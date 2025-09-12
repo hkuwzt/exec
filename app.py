@@ -120,15 +120,47 @@ class CourseScheduler:
             return pd.DataFrame(columns=['course_id', 'date', 'start_time', 'end_time', 'start_datetime', 'end_datetime'])
     
     def get_all_courses(self):
-        """Return all courses as a list of dictionaries"""
-        return self.courses_info_df.to_dict('records')
+        """Return all courses as a list of dictionaries with first session info"""
+        courses = self.courses_info_df.to_dict('records')
+        
+        # Add first session information to each course for sorting
+        for course in courses:
+            first_session = self.get_first_session(course['course_id'])
+            course['first_session_date'] = first_session['date'] if first_session else '9999-12-31'
+            course['first_session_time'] = first_session['start_time'] if first_session else '23:59'
+            course['first_session_datetime'] = first_session['datetime'] if first_session else None
+        
+        # Sort courses by first session datetime
+        courses.sort(key=lambda x: x['first_session_datetime'] if x['first_session_datetime'] else datetime.max)
+        
+        return courses
+    
+    def get_first_session(self, course_id):
+        """Get the first session for a given course"""
+        course_sessions = self.course_sessions_df[self.course_sessions_df['course_id'] == course_id]
+        if course_sessions.empty:
+            return None
+        
+        # Sort by date and time to get the earliest session
+        first_session = course_sessions.loc[course_sessions['start_datetime'].idxmin()]
+        return {
+            'date': first_session['date'],
+            'start_time': first_session['start_time'],
+            'datetime': first_session['start_datetime']
+        }
     
     def get_courses_by_program(self, program):
-        """Filter courses by program"""
+        """Filter courses by program and sort by first session"""
         if program == 'All':
             return self.get_all_courses()
-        filtered_df = self.courses_info_df[self.courses_info_df['program'] == program]
-        return filtered_df.to_dict('records')
+        
+        # Get all courses first (which includes sorting)
+        all_courses = self.get_all_courses()
+        
+        # Filter by program while maintaining the sort order
+        filtered_courses = [course for course in all_courses if course['program'] == program]
+        
+        return filtered_courses
     
     def get_programs(self):
         """Get all unique programs"""
@@ -191,7 +223,8 @@ class CourseScheduler:
         
         for _, session in selected_sessions.iterrows():
             course = selected_courses[selected_courses['course_id'] == session['course_id']].iloc[0]
-            date_obj = pd.to_datetime(session['date'])
+            # Parse date without timezone conversion to avoid day shifts
+            date_obj = pd.to_datetime(session['date'], format='%Y-%m-%d')
             events.append({
                 'id': course['course_id'],
                 'title': f"{course['course_id']}: {course['course_name']}",
@@ -199,7 +232,7 @@ class CourseScheduler:
                 'location': course['location'],
                 'start_time': session['start_time'],
                 'end_time': session['end_time'],
-                'date': session['date'],
+                'date': session['date'],  # Keep original date string to avoid timezone issues
                 'program': course['program'],
                 'day': date_obj.strftime('%A')  # Add the day of week
             })

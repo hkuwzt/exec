@@ -1,7 +1,4 @@
 course_id,course_name,instructor,program,location
-OTHER001,Career Fair,Not Applicable,Other Events,Hong Kong
-OTHER002,CDT Communication Series,Not Applicable,Other Events,Town Centre
-OTHER003,CDT Impromptu Speaking Mastery,Not Applicable,Other Events,Town Centre
 MFIN7054,Introduction to Cryptocurrencies and Digital Assets,Prof. Henri Arslanian,Elective Courses,Unspecified
 PMBA2246,Supply Chain Management,Prof. Benjamin Yen,Elective Courses,Unspecified
 PMBA2963,Managerial Economics,Prof. Wen Zhou,Core Courses,Cyberport
@@ -57,3 +54,32 @@ PMBA6130,FinTech and Innovation in Financial Services,Prof. David Lee,Elective C
 PMBA6131,Corporate Fund-Raising Initiatives in the Chinese Equity Market,Prof. Anthony Yang,Elective Courses,Unspecified
 PMBA6132,Integrated Wealth Planning: Family Office and Asset Allocation,Prof. Anthony Yang,Elective Courses,Unspecified
 PMBA6134,AI in Financial Services: Leading Change in the Digital Era,Mr. Alain Le Couedic,Elective Courses,Unspecified
+OTHER001,HKU Business School Career Fair,Not Applicable,Other Events,Ocean Park Marriott
+OTHER002,CDT Leadership Communication I,Eka Aleksandrova,Other Events,HKU Town Centre
+OTHER003,CDT General Skills (Impromptu Speaking),Akash Karia,Other Events,HKU Town Centre
+OTHER004,CDT Industry Immersion Workshop,Case Prep Zone,Other Events,iCube
+OTHER005,CDT General Skills (Stand Out on Paper),Evelyn T Chan,Other Events,HKU Town Centre
+OTHER006,CDT Essential Skills (Step Up Your Game),Zehao Xiong,Other Events,HKU Town Centre
+OTHER007,CDT Essential Skills (Elevate Your Career),Samantha Cheng,Other Events,HKU Town Centre
+OTHER008,CDT General Skills (Interview Practice),LHH,Other Events,HKU Town Centre
+OTHER009,CDT Communication Series II,Eka Aleksandrova,Other Events,HKU Town Centre
+OTHER010,CDT Communication Series III,Eka Aleksandrova,Other Events,HKU Town Centre
+OTHER011,CDT Communication Series IV,Eka Aleksandrova,Other Events,HKU Town Centre
+OTHER012,CDT Essential Skills (Financial Modeling),Case Prep Zone,Other Events,HKU Town Centre
+OTHER013,CDT Essential Skills (Stock Pitching),Case Prep Zone,Other Events,HKU Town Centre
+OTHER014,CDT Well-being and Stress Management,Cavan Chan,Other Events,HKU Town Centre
+OTHER016,CDT Executive Coaching Day,Varioius,Other Events,Cyberport
+OTHER017,CDT Professional Photoshoot,Not Applicable,Other Events,Cyberport
+OTHER018,CDT Leadership Forum I,Yiyin Zhao,Other Events,iCube
+OTHER019,CDT Meeting with Sachin & CDT I,CDT team,Other Events,HKU Town Centre
+OTHER020,CDT Meeting with Sachin & CDT II,CDT team,Other Events,HKU Town Centre
+OTHER021,MBA Community Networking Night,Not Applicable,Other Events,HKU
+OTHER022,TalentTalks: Estee Lauder Companies,Tom Garruto,Other Events,Online
+OTHER023,HKU Business School Career Fair Shenzhen Campus,Not Applicable,Other Events,HKU Shenzhen
+OTHER024,Goldman Sachs Controllers Workshop,Goldman Sachs,Other Events,Online
+OTHER025,Hong Kong Talent Engage Seminar,Wendy Wong,Other Events,Wanchai
+OTHER026,Oliver Wyman Hong Kong: From Campus To Consulting,Oliver Wyman,Other Events,TBC
+OTHER027,Citi Path to Your Profession,Citigroup,Other Events,Online
+OTHER028,Hong Kong Talent Engage Global Online Career Fair,"Hong Kong Talent Engage, efinancialcareers",Other Events,Online
+OTHER029,Siemens Leadership Program Opportunities Event,Siemens Limited,Other Events,Online
+OTHER030,HKU Career Fair,HKU,Other Events,HKU
